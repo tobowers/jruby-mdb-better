@@ -37,11 +37,16 @@ public class RubyMessageRuntime {
     }
 
     public void handleMessage (Message message) {
+        logger.info("so now rubyruntime is processing it");
         IRubyObject rubyMessage = JavaEmbedUtils.javaToRuby(runtime, message);
-        IRubyObject rubyReceiver = runtime.getTopSelf();
-        Object args = rubyMessage;
-        JavaEmbedUtils.invokeMethod(runtime, rubyReceiver, "handle_message", new Object[] {rubyMessage}, null);
+        logger.info("so now the rubyMessage has been converted");
+        IRubyObject rubyReceiver = evaler.eval(runtime, "require 'META-INF/boot.rb'");
+
+        logger.info("sending to ruby");
+
+        JavaEmbedUtils.invokeMethod(runtime, rubyReceiver, "handle_message!", new Object[] {rubyMessage}, null);
     }
+
 
     public void eval (String r) {
         evaler.eval(runtime, r);
