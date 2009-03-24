@@ -4,21 +4,15 @@ require 'java'
 require 'yaml'
 require 'net/http'
 
-include_class "com.motionbox.requester.RequesterBean"
+def handle_message(msg)
+  puts "message received"
+  puts msg.inspect
+end
 
 class MessageHandler
 
   def self.handle_message!
-    if defined?(RequesterBean)
-      puts "the java class is defined"
-    end
-    if defined?(RequesterBean.getMessage)
-      puts "the getMessage method is defined"
-      msg = RequesterBean.getMessage
-      puts "body is: " + msg.getText()
-      url = YAML.load(msg)
-      Net::HTTP.get_print URI.parse(url[:url])
-    end
+    
 #    message_body = serialized_messageed_message.get_content.get_data.inject("") { |body, byte| body << byte }
 #    puts message_body
     # I will get the message and do whatever you want with it

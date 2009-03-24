@@ -11,6 +11,10 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 import javax.jms.JMSException;
+
+import org.jruby.javasupport.JavaEmbedUtils;
+
+
 import java.util.logging.*;
 
 import org.jruby.exceptions.RaiseException;
@@ -25,26 +29,12 @@ import org.jruby.exceptions.RaiseException;
     })
 public class RequesterBean implements MessageListener {
     private static Logger logger = Logger.getLogger("com.motionbox.requester");
-    private RubyMessageRuntime runtime = new RubyMessageRuntime();
-    private Message messageStore;
 
     public RequesterBean() {}
 
     public void onMessage(Message message) {
         logger.info("message received");
-        TextMessage tm = (TextMessage)message;
-        setMessage(message);
-        logger.info("telling ruby to retrieve the message");
-        runtime.eval("MessageHandler.handle_message!");
+        RubyMessageRuntime runtime = new RubyMessageRuntime();
+        runtime.handleMessage(message);
     }
-
-    public Message setMessage(Message message) {
-        messageStore = message;
-        return message;
-    }
-
-    public Message getMessage() {
-        return messageStore;
-    }
-    
 }

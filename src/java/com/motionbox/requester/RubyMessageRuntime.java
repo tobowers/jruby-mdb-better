@@ -7,9 +7,15 @@ package com.motionbox.requester;
 
 import org.jruby.Ruby;
 import org.jruby.RubyRuntimeAdapter;
+import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.javasupport.JavaEmbedUtils;
-import org.jruby.exceptions.RaiseException;
+
+
+import java.util.List;
 import java.util.ArrayList;
+
+import javax.jms.Message;
+
 import java.util.logging.*;
 
 /**
@@ -23,16 +29,18 @@ public class RubyMessageRuntime {
 
 
     public RubyMessageRuntime() {
-        runtime = JavaEmbedUtils.initialize(new ArrayList());
+//        new ArrayList(new String[] ["foo", "bar"])
+        List loadPaths = new ArrayList();
+        loadPaths.add("META-INF/ruby");
+        runtime = JavaEmbedUtils.initialize(loadPaths);
         evaler = JavaEmbedUtils.newRuntimeAdapter();
+    }
 
-        try {
-          evaler.eval(runtime, "require 'META-INF/boot.rb'");
-        }
-        catch (RaiseException re) {
-            logger.severe("Raise Exception on eval require: " + re.getMessage());
-            throw re;
-        }
+    public void handleMessage (Message message) {
+        IRubyObject rubyMessage = JavaEmbedUtils.javaToRuby(runtime, message);
+        IRubyObject rubyReceiver = runtime.getTopSelf();
+        Object args = rubyMessage;
+        JavaEmbedUtils.invokeMethod(runtime, rubyReceiver, "handle_message", new Object[] {rubyMessage}, null);
     }
 
     public void eval (String r) {
